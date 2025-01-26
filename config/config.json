@@ -1,0 +1,9 @@
+{
+    "development": {
+      "username": "aarya",
+      "password": "1278",
+      "database": "imf_gadgets",
+      "host": "127.0.0.1",
+      "dialect": "postgres"
+    }
+  }
