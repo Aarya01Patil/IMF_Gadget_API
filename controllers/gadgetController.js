@@ -1,4 +1,3 @@
-// controllers/gadgetController.js
 const { Gadget } = require('../models');
 const { Op } = require('sequelize');
 

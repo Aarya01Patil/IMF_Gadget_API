@@ -1,4 +1,3 @@
-// models/user.js
 const bcrypt = require('bcryptjs');
 
 module.exports = (sequelize, DataTypes) => {

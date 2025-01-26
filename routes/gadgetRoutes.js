@@ -1,4 +1,3 @@
-// routes/gadgetRoutes.js
 const express = require('express');
 const router = express.Router();
 const gadgetController = require('../controllers/gadgetController');

@@ -1,4 +1,3 @@
-// models/gadget.js
 module.exports = (sequelize, DataTypes) => {
     const Gadget = sequelize.define('Gadget', {
       id: {

@@ -1,28 +1,33 @@
-// models/index.js
 const Sequelize = require('sequelize');
 require('dotenv').config();
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME,       // Database name
-  process.env.DB_USER,       // Username
-  process.env.DB_PASSWORD,   // Password
+  process.env.DATABASE_URL || 
+  `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}`,
   {
-    host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: process.env.DATABASE_URL ? {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    } : {}
   }
 );
 
-// Create an object to hold all models
+// Create a db object to hold the models
 const db = {};
 
+// Attach Sequelize and sequelize instance to the db object
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-// Import models and attach them to the db object
+// Import models and initialize them
 db.Gadget = require('./gadget')(sequelize, Sequelize.DataTypes);
 db.User = require('./user')(sequelize, Sequelize.DataTypes);
 
-// Test the connection
+// Test the database connection
 sequelize
   .authenticate()
   .then(() => {
@@ -32,11 +37,14 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
-// Sync models with database
+// Sync the models with the database
 sequelize
   .sync({ force: false })
   .then(() => {
     console.log('Database & tables created!');
+  })
+  .catch(err => {
+    console.error('Error syncing database:', err);
   });
 
 module.exports = db;
