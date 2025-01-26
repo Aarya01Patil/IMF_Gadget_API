@@ -1,0 +1,259 @@
+{
+	"info": {
+		"_postman_id": "a640bbfe-57ab-4f0c-ab93-e6881ea6bc9f",
+		"name": "IMF Gadget API",
+		"description": "# **IMF Gadget API**\n\n**Overview:**\n\nWelcome to the **IMF Gadget API**! This API allows agents of the Impossible Missions Force (IMF) to manage their gadget inventory securely. The API provides endpoints to:\n\n- **Register** and **login** agents.\n    \n- **Create**, **retrieve**, **update**, and **decommission** gadgets.\n    \n- **Trigger self-destruct sequences** for gadgets.\n    \n\nAll endpoints require authentication using **JSON Web Tokens (JWT)**, except for the registration and login endpoints.\n\n**Base URL:**\n\n```\nhttps://imf-gadget-api-welb.onrender.com\n\n ```\n\n**Authentication:**\n\n- **Register** a new agent using **POST** `/auth/register`.\n    \n- **Login** an existing agent using **POST** `/auth/login` to receive a JWT token.\n    \n- **Include the JWT token** in the `Authorization` header as `Bearer` for all protected endpoints.\n    \n\n**Error Handling:**\n\n- The API returns appropriate HTTP status codes for each response.\n    \n- Error responses include a message describing the error.\n    \n\n---\n\n## **Requests Documentation**\n\n### **1\\. Display Root Message**\n\n- **Method:** `GET`\n    \n- **URL:** `/`\n    \n\n**Description:**\n\n- Retrieves a welcome message from the API.\n    \n\n**Headers:**\n\n- None\n    \n\n**Parameters:**\n\n- None\n    \n\n**Body:**\n\n- None\n    \n\n**Tests:**\n\n- **Status Code:** Ensure the response status code is `200 OK`.\n    \n- **Response Content:** Verify that the response contains the welcome message.\n    \n\n**Example Response:**\n\n``` json\n\"Welcome to the IMF Gadget API!\"\n\n ```\n\n---\n\n### **2\\. Register Agent**\n\n- **Method:** `POST`\n    \n- **URL:** `/auth/register`\n    \n\n**Description:**\n\n- Registers a new agent by creating a user account.\n    \n\n**Headers:**\n\n- `Content-Type: application/json`\n    \n\n**Parameters:**\n\n- None\n    \n\n**Body:**\n\n- **Required Fields:**\n    \n    - `username` (string)\n        \n    - `password` (string)\n        \n\n**Example Request Body:**\n\n``` json\n{\n  \"username\": \"agent007\",\n  \"password\": \"your_password\"\n}\n\n ```\n\n**Tests:**\n\n- **Status Code:** Ensure the response status code is `200 OK`.\n    \n- **Response Content:** Verify that the response confirms the registration.\n    \n\n**Example Response:**\n\n``` json\n{\n  \"message\": \"User registered\",\n  \"user\": {\n    \"id\": 1,\n    \"username\": \"agent007\"\n  }\n}\n\n ```\n\n---\n\n### **3\\. Login Agent**\n\n- **Method:** `POST`\n    \n- **URL:** `/auth/login`\n    \n\n**Description:**\n\n- Authenticates an agent and returns a JWT token.\n    \n\n**Headers:**\n\n- `Content-Type: application/json`\n    \n\n**Parameters:**\n\n- None\n    \n\n**Body:**\n\n- **Required Fields:**\n    \n    - `username` (string)\n        \n    - `password` (string)\n        \n\n**Example Request Body:**\n\n``` json\n{\n  \"username\": \"agent007\",\n  \"password\": \"your_password\"\n}\n\n ```\n\n**Tests:**\n\n- **Status Code:** Ensure the response status code is `200 OK`.\n    \n- **Response Content:** Verify that the response includes a JWT token.\n    \n- if (pm.response.code === 200) { var jsonData = pm.response.json(); pm.environment.set(\"token\", jsonData.token);}\n    \n    In the **Tests** tab, add:\n    \n\n**Example Response:**\n\n``` json\n{\n  \"message\": \"Logged in\",\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6...\"\n}\n\n ```\n\n---\n\n### **4\\. Get All Gadgets**\n\n- **Method:** `GET`\n    \n- **URL:** `/gadgets`\n    \n\n**Description:**\n\n- Retrieves a list of all gadgets with a randomly generated mission success probability.\n    \n\n**Headers:**\n\n- `Authorization: Bearer {{token}}`\n    \n\n**Parameters:**\n\n- **Query Parameters:**\n    \n    - `status` (string, optional): Filter gadgets by status (`Available`, `Deployed`, `Destroyed`, `Decommissioned`).\n        \n\n**Body:**\n\n- None\n    \n\n**Tests:**\n\n- **Status Code:** Ensure the response status code is `200 OK`.\n    \n- **Response Content:** Verify that the response is an array of gadgets.\n    \n\n**Example Response:**\n\n``` json\n[\n  {\n    \"id\": \"d3b5c4c0-7c3c-4f4a-bb2e-3d75b6f7a7e1\",\n    \"name\": \"Laser Pen\",\n    \"status\": \"Available\",\n    \"decommissionedAt\": null,\n    \"missionSuccessProbability\": \"87%\"\n  },\n  {\n    \"id\": \"e4f5d6a7-8b9c-4d1a-bb3e-1f23c4d5e6f7\",\n    \"name\": \"The Nightingale\",\n    \"status\": \"Deployed\",\n    \"decommissionedAt\": null,\n    \"missionSuccessProbability\": \"62%\"\n  }\n]\n\n ```\n\n---\n\n### **5\\. Add New Gadget**\n\n- **Method:** `POST`\n    \n- **URL:** `/gadgets`\n    \n\n**Description:**\n\n- Adds a new gadget to the inventory. If no name is provided, a random codename is assigned.\n    \n\n**Headers:**\n\n- `Content-Type: application/json`\n    \n- `Authorization: Bearer {{token}}`\n    \n\n**Parameters:**\n\n- None\n    \n\n**Body:**\n\n- **Optional Fields:**\n    \n    - `name` (string): Custom name for the gadget.\n        \n\n**Example Request Body:**\n\n``` json\n{\n  \"name\": \"Invisible Cloak\"\n}\n\n ```\n\n**Tests:**\n\n- **Status Code:** Ensure the response status code is `201 Created`.\n    \n- **Response Content:** Verify that the gadget is added and returned in the response.\n    \n\n**Example Response:**\n\n``` json\n{\n  \"id\": \"a1b2c3d4-5e6f-7a8b-9c0d-ef1a2b3c4d5e\",\n  \"name\": \"Invisible Cloak\",\n  \"status\": \"Available\",\n  \"decommissionedAt\": null\n}\n\n ```\n\n---\n\n### **6\\. Update Gadget**\n\n- **Method:** `PATCH`\n    \n- **URL:** `/gadgets/:id`\n    \n\n**Description:**\n\n- Updates information of an existing gadget.\n    \n\n**Headers:**\n\n- `Content-Type: application/json`\n    \n- `Authorization: Bearer {{token}}`\n    \n\n**Parameters:**\n\n- **Path Variable:**\n    \n    - `id` (UUID): The unique identifier of the gadget to update.\n        \n\n**Body:**\n\n- **Updatable Fields:**\n    \n    - `name` (string, optional)\n        \n    - `status` (string, optional): Must be one of `Available`, `Deployed`, `Destroyed`, `Decommissioned`.\n        \n\n**Example Request Body:**\n\n``` json\n{\n  \"name\": \"Enhanced Invisible Cloak\",\n  \"status\": \"Deployed\"\n}\n\n ```\n\n**Tests:**\n\n- **Status Code:** Ensure the response status code is `200 OK`.\n    \n- **Response Content:** Verify that the gadget information is updated.\n    \n\n**Example Response:**\n\n``` json\n{\n  \"id\": \"a1b2c3d4-5e6f-7a8b-9c0d-ef1a2b3c4d5e\",\n  \"name\": \"Enhanced Invisible Cloak\",\n  \"status\": \"Deployed\",\n  \"decommissionedAt\": null\n}\n\n ```\n\n---\n\n### **7\\. Decommission Gadget**\n\n- **Method:** `DELETE`\n    \n- **URL:** `/gadgets/:id`\n    \n\n**Description:**\n\n- Marks a gadget as \"Decommissioned\" and records the timestamp.\n    \n\n**Headers:**\n\n- `Authorization: Bearer {{token}}`\n    \n\n**Parameters:**\n\n- **Path Variable:**\n    \n    - `id` (UUID): The unique identifier of the gadget to decommission.\n        \n\n**Body:**\n\n- None\n    \n\n**Tests:**\n\n- **Status Code:** Ensure the response status code is `200 OK`.\n    \n- **Response Content:** Verify that the gadget's status is updated to \"Decommissioned\".\n    \n\n**Example Response:**\n\n``` json\n{\n  \"message\": \"Gadget decommissioned\",\n  \"gadget\": {\n    \"id\": \"a1b2c3d4-5e6f-7a8b-9c0d-ef1a2b3c4d5e\",\n    \"name\": \"Enhanced Invisible Cloak\",\n    \"status\": \"Decommissioned\",\n    \"decommissionedAt\": \"2023-10-08T12:34:56.789Z\"\n  }\n}\n\n ```\n\n---\n\n### **8\\. Self-Destruct Gadget**\n\n- **Method:** `POST`\n    \n- **URL:** `/gadgets/:id/self-destruct`\n    \n\n**Description:**\n\n- Triggers the self-destruct sequence for a specific gadget, changing its status to \"Destroyed\".\n    \n\n**Headers:**\n\n- `Authorization: Bearer {{token}}`\n    \n\n**Parameters:**\n\n- **Path Variable:**\n    \n    - `id` (UUID): The unique identifier of the gadget to self-destruct.\n        \n\n**Body:**\n\n- None\n    \n\n**Tests:**\n\n- **Status Code:** Ensure the response status code is `200 OK`.\n    \n- **Response Content:** Verify that the gadget's status is updated to \"Destroyed\".\n    \n\n**Example Response:**\n\n``` json\n{\n  \"message\": \"Gadget self-destructed\",\n  \"gadget\": {\n    \"id\": \"a1b2c3d4-5e6f-7a8b-9c0d-ef1a2b3c4d5e\",\n    \"name\": \"Enhanced Invisible Cloak\",\n    \"status\": \"Destroyed\",\n    \"decommissionedAt\": null\n  }\n}\n\n ```\n\n---\n\n### **9\\. Show All Gadgets (with Status Filter)**\n\n- **Method:** `GET`\n    \n- **URL:** `/gadgets`\n    \n\n**Description:**\n\n- Retrieves a list of all gadgets, with an option to filter by status.\n    \n\n**Headers:**\n\n- `Authorization: Bearer {{token}}`\n    \n\n**Parameters:**\n\n- **Query Parameters:**\n    \n    - `status` (string, optional): Filter gadgets by status.\n        \n\n**Body:**\n\n- None\n    \n\n**Tests:**\n\n- **Status Code:** Ensure the response status code is `200 OK`.\n    \n- **Response Content:** Verify that the response is an array of gadgets matching the filter criteria.\n    \n\n**Example Request:**\n\n- /gadgets?status=Available\n    \n\n**Example Response:**\n\n``` json\n[\n  {\n    \"id\": \"d3b5c4c0-7c3c-4f4a-bb2e-3d75b6f7a7e1\",\n    \"name\": \"Laser Pen\",\n    \"status\": \"Available\",\n    \"decommissionedAt\": null,\n    \"missionSuccessProbability\": \"87%\"\n  }\n]\n\n ```\n\n---\n\n## **General Notes**\n\n- **Authentication Required:**\n    \n    - All endpoints except `/` (root), `/auth/register`, and `/auth/login` require a valid JWT token.\n        \n    - Include the token in the `Authorization` header as `Bearer {{token}}`.\n        \n- **Using Variables in Postman:**\n    \n    - Store the `token` in an environment variable after logging in.\n        \n    - Use `{{token}}` in the `Authorization` header to reference it.\n        \n- **Error Responses:**\n    \n    - **401 Unauthorized:** Missing or invalid token.\n        \n    - **404 Not Found:** Gadget not found.\n        \n    - **400 Bad Request:** Invalid input data.\n        \n- **Response Structures:**\n    \n    - Success responses include the requested data or a confirmation message.\n        \n    - Error responses include an `error` field with a descriptive message.\n        \n\n---\n\n## **Examples of Test Scripts**\n\n### **Check for Successful Status Code**\n\nIn the **Tests** tab, add:\n\n``` javascript\npm.test(\"Status code is 200\", function () {\n  pm.response.to.have.status(200);\n});\n\n ```\n\n### **Verify Response Structure**\n\n``` javascript\npm.test(\"Response is an array\", function () {\n  var jsonData = pm.response.json();\n  pm.expect(jsonData).to.be.an('array');\n});\n\n ```\n\n### **Check for Required Fields in Response**\n\n``` javascript\npm.test(\"Gadget has id and name\", function () {\n  var jsonData = pm.response.json();\n  pm.expect(jsonData).to.have.property('id');\n  pm.expect(jsonData).to.have.property('name');\n});\n\n ```\n\n---\n\n## **Summary of Steps to Use the API**\n\n1. **Access the Root URL:**\n    \n    - Send a `GET` request to `/` to receive a welcome message.\n        \n2. **Register a New Agent:**\n    \n    - Send a `POST` request to `/auth/register` with `username` and `password`.\n        \n3. **Login to Obtain a Token:**\n    \n    - Send a `POST` request to `/auth/login` with your credentials.\n        \n    - Store the received `token` in your environment.\n        \n4. **Include the Token in Headers:**\n    \n    - For all subsequent requests, include `Authorization: Bearer {{token}}` in the headers.\n        \n5. **Manage Gadgets:**\n    \n    - **Add a Gadget:** `POST` `/gadgets` with optional `name`.\n        \n    - **View Gadgets:** `GET` `/gadgets` with optional `status` query parameter.\n        \n    - **Update a Gadget:** `PATCH` `/gadgets/:id` with updated fields.\n        \n    - **Decommission a Gadget:** `DELETE` `/gadgets/:id`.\n        \n    - **Self-Destruct a Gadget:** `POST` `/gadgets/:id/self-destruct`.\n        \n\n---",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33551708"
+	},
+	"item": [
+		{
+			"name": "Welcome Message",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://imf-gadget-api-welb.onrender.com/",
+					"protocol": "https",
+					"host": [
+						"imf-gadget-api-welb",
+						"onrender",
+						"com"
+					],
+					"path": [
+						""
+					]
+				},
+				"description": "- Retrieves a welcome message from the API, confirming that the server is running.Retrieves a welcome message from the API, confirming that the server is running."
+			},
+			"response": []
+		},
+		{
+			"name": "User Registration",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\" : \"James Bond\",\n    \"password\" : \"agent007\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://imf-gadget-api-welb.onrender.com/auth/register",
+					"protocol": "https",
+					"host": [
+						"imf-gadget-api-welb",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				},
+				"description": "- Allows new agents to register by creating a user account with a username and password."
+			},
+			"response": []
+		},
+		{
+			"name": "User Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"James Bond\",\n  \"password\": \"agent007\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://imf-gadget-api-welb.onrender.com/auth/login",
+					"protocol": "https",
+					"host": [
+						"imf-gadget-api-welb",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				},
+				"description": "- Authenticates agents and provides a JSON Web Token (JWT) for access to protected endpoints."
+			},
+			"response": []
+		},
+		{
+			"name": "Add Gadgets",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTczNzkxOTcxMCwiZXhwIjoxNzM3OTIzMzEwfQ.dBALzqPKEk5nbZSUMe7j7IIDZ2iGHvxhk9I259Uo0Bs",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\" : \"Laser Gun\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://imf-gadget-api-welb.onrender.com/gadgets",
+					"protocol": "https",
+					"host": [
+						"imf-gadget-api-welb",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"gadgets"
+					]
+				},
+				"description": "- Adds a new gadget to the inventory, assigning it a unique codename if no name is provided."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Gadget",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczNzkxOTE2MywiZXhwIjoxNzM3OTIyNzYzfQ.Q_od3NYDGDHeCMzH3Ecun1qdom-4fqJWdiogJ9-rOtM",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\" : \"Void Blaster\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://imf-gadget-api-welb.onrender.com/gadgets/d07240fb-189d-4b3c-82e3-521b3792d5e1",
+					"protocol": "https",
+					"host": [
+						"imf-gadget-api-welb",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"gadgets",
+						"d07240fb-189d-4b3c-82e3-521b3792d5e1"
+					]
+				},
+				"description": "- Updates the details of an existing gadget, such as its name or status."
+			},
+			"response": []
+		},
+		{
+			"name": "Decommission Gadget",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczNzkxOTE2MywiZXhwIjoxNzM3OTIyNzYzfQ.Q_od3NYDGDHeCMzH3Ecun1qdom-4fqJWdiogJ9-rOtM",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://imf-gadget-api-welb.onrender.com/gadgets/d07240fb-189d-4b3c-82e3-521b3792d5e1?",
+					"protocol": "https",
+					"host": [
+						"imf-gadget-api-welb",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"gadgets",
+						"d07240fb-189d-4b3c-82e3-521b3792d5e1"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null
+						}
+					]
+				},
+				"description": "-  Marks a gadget as \"Decommissioned\" and records the timestamp, without permanently deleting it."
+			},
+			"response": []
+		},
+		{
+			"name": "Self-Destruct Gadget",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczNzkxOTE2MywiZXhwIjoxNzM3OTIyNzYzfQ.Q_od3NYDGDHeCMzH3Ecun1qdom-4fqJWdiogJ9-rOtM",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://imf-gadget-api-welb.onrender.com/gadgets/d07240fb-189d-4b3c-82e3-521b3792d5e1/self-destruct",
+					"protocol": "https",
+					"host": [
+						"imf-gadget-api-welb",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"gadgets",
+						"d07240fb-189d-4b3c-82e3-521b3792d5e1",
+						"self-destruct"
+					]
+				},
+				"description": "- Triggers the self-destruct sequence for a specified gadget, changing its status to \"Destroyed\"."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Gadgets",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczNzkxOTE2MywiZXhwIjoxNzM3OTIyNzYzfQ.Q_od3NYDGDHeCMzH3Ecun1qdom-4fqJWdiogJ9-rOtM",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://imf-gadget-api-welb.onrender.com/gadgets/d07240fb-189d-4b3c-82e3-521b3792d5e1/self-destruct",
+					"protocol": "https",
+					"host": [
+						"imf-gadget-api-welb",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"gadgets",
+						"d07240fb-189d-4b3c-82e3-521b3792d5e1",
+						"self-destruct"
+					]
+				},
+				"description": "-  Retrieves a list of all gadgets in the inventory, including a random mission success probability for each"
+			},
+			"response": []
+		}
+	]
+}
