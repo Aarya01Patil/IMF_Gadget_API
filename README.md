@@ -13,10 +13,7 @@ Welcome to the **IMF Gadget API** repository! This project is developed to manag
 - [Running the Application](#running-the-application)
 - [API Documentation](#api-documentation)
 - [Testing the API](#testing-the-api)
-- [Deployment](#deployment)
-- [Built With](#built-with)
 - [License](#license)
-- [Acknowledgments](#acknowledgments)
 
 ---
 
